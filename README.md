@@ -1,0 +1,1 @@
+Plataforma de processamento de mídia com IA, reconstruída para execução local a partir de uma arquitetura originalmente baseada em cloud.
