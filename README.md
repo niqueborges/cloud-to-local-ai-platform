@@ -1,6 +1,6 @@
 # cloud-to-local-ai-platform
 
-Plataforma de processamento de mídia com IA, reconstruída para execução local a partir de uma arquitetura originalmente baseada em cloud.
+Este projeto é uma adaptação de um sistema originalmente desenvolvido durante minha participação em um programa de bolsas com foco em AWS e Machine Learning. Nesta versão, a arquitetura foi reconstruída para rodar localmente com ferramentas open source.
 
 ## Funcionalidades
 
