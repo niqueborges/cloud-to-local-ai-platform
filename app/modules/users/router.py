@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.modules.users.models import UserCreate, UserResponse
+from app.modules.users.models import UserCreate, UserResponse, UserUpdate
 from app.modules.users.models_db import UserDB
 from app.dependencies import get_db
 
@@ -47,3 +47,20 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "User deleted"}
+
+@router.patch("/{user_id}", response_model=UserResponse)
+def update_user(user_id: str, user_update: UserUpdate, db: Session = Depends(get_db)):
+    user = db.query(UserDB).filter(UserDB.id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    update_data = user_update.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(user, key, value)
+
+    db.commit()
+    db.refresh(user)
+
+    return user
