@@ -5,7 +5,7 @@ Este projeto é uma adaptação de um sistema originalmente desenvolvido durante
 ## Funcionalidades
 
 - [x] Gerenciamento de usuários (CRUD completo com FastAPI e SQLite)
-- [ ] Análise de imagens
+- [ ] Análise de imagens (em andamento)
 - [ ] Processamento de áudio
 - [ ] Chatbot
 
