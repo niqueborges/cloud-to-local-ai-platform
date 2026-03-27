@@ -8,6 +8,8 @@ fastapi==0.135.2
 greenlet==3.3.2
 h11==0.16.0
 idna==3.11
+numpy==2.4.3
+opencv-python==4.13.0.92
 pillow==12.1.1
 pydantic==2.12.5
 pydantic_core==2.41.5
