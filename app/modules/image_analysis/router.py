@@ -20,14 +20,20 @@ async def analyze_image(file: UploadFile = File(...)):
 
     gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
 
-    faces = face_cascade.detectMultiScale(
-        gray,
-        scaleFactor=1.1,
-        minNeighbors=5
-    )
+    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+
+    formatted_faces = []
+
+    for (x, y, w, h) in faces:
+        formatted_faces.append({
+            "x": int(x),
+            "y": int(y),
+            "width": int(w),
+            "height": int(h)
+        })
 
     return {
         "filename": file.filename,
-        "faces_detected": len(faces),
-        "faces": faces.tolist()
+        "faces_detected": len(formatted_faces),
+        "faces": formatted_faces
     }
