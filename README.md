@@ -6,7 +6,7 @@ Este projeto é uma adaptação de um sistema originalmente desenvolvido durante
 
 - [x] Gerenciamento de usuários (CRUD com FastAPI e SQLite)
 - [x] Upload e análise de imagens
-- [x] Detecção de rostos (OpenCV, execução local);inclui detecção de rostos local substituindo AWS Rekognition.
+- [x] Detecção de rostos (OpenCV, execução local);Inclui detecção de rostos local substituindo AWS Rekognition.
 - [ ] Processamento de áudio
 - [ ] Chatbot
 
