@@ -68,3 +68,7 @@ models/
 tmp/
 temp/
 *.tmp
+
+# Storage
+storage/
+storage/images/
