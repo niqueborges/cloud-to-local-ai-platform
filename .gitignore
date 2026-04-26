@@ -72,3 +72,4 @@ temp/
 # Storage
 storage/
 storage/images/
+*.db
