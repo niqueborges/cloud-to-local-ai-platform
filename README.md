@@ -1,141 +1,177 @@
 # cloud-to-local-ai-platform
 
-Este projeto é uma adaptação de um sistema originalmente desenvolvido durante minha participação em um programa de bolsas com foco em AWS e Machine Learning. Nesta versão, a arquitetura foi reconstruída para rodar localmente com ferramentas open source. API para processamento de imagens com detecção de faces, executando localmente sem dependência de serviços em nuvem.
+API para processamento de imagens com detecção de faces rodando
+localmente, sem dependência de serviços em nuvem.
 
----
+O projeto implementa um pipeline completo: upload → processamento →
+detecção → persistência → entrega via HTTP.
+
+------------------------------------------------------------------------
+
+## Contexto
+
+Este projeto é uma adaptação de um sistema desenvolvido durante um
+programa com foco em AWS e Machine Learning. Aqui, a arquitetura foi
+reimplementada para execução local usando ferramentas open source.
+
+O objetivo é demonstrar como construir um serviço de visão computacional
+com controle total sobre dados e infraestrutura.
+
+------------------------------------------------------------------------
 
 ## Problema
 
-Soluções de processamento de imagem costumam depender de serviços em nuvem, o que implica custo, latência e menor controle sobre os dados.
+Serviços de análise de imagem em nuvem têm custo recorrente, dependem de
+rede e exigem envio de dados para terceiros.
 
-Este projeto demonstra como executar esse fluxo localmente, mantendo controle total sobre processamento e armazenamento.
+Em alguns cenários, isso não é viável.
 
----
+------------------------------------------------------------------------
 
 ## Solução
 
-A aplicação fornece uma API capaz de:
+A aplicação expõe uma API que processa imagens localmente:
 
-- Receber upload de imagens
-- Processar imagens localmente
-- Detectar faces utilizando OpenCV
-- Desenhar bounding boxes nas faces detectadas
-- Armazenar imagens processadas no sistema de arquivos
-- Servir imagens via endpoint HTTP
+-   recebe arquivos via upload
+-   executa detecção de faces com OpenCV
+-   desenha bounding boxes
+-   salva a imagem processada no sistema de arquivos
+-   persiste metadados no banco
+-   disponibiliza acesso à imagem via endpoint
 
----
+------------------------------------------------------------------------
 
 ## Arquitetura
 
-O projeto segue separação por camadas:
+Separação em camadas:
 
-- **Router**: entrada HTTP (FastAPI)
-- **Service**: lógica de negócio e processamento
-- **Models**: validação de dados (Pydantic)
-- **Database**: persistência (SQLAlchemy + SQLite)
+-   Router: camada HTTP (FastAPI)
+-   Service: processamento e regras de negócio
+-   Models: schemas (Pydantic) e ORM (SQLAlchemy)
+-   Database: SQLite
 
-### Fluxo da aplicação
+Essa separação mantém o código testável e reduz acoplamento.
 
-Upload → Processamento → Detecção → Salvamento → Resposta
+### Fluxo
 
----
+Upload → Service → OpenCV → Storage → Database → Response
+
+------------------------------------------------------------------------
 
 ## Tecnologias
 
-- FastAPI
-- OpenCV
-- SQLite
-- SQLAlchemy
-- Pydantic
-- Pillow
+-   FastAPI
+-   OpenCV
+-   SQLite
+-   SQLAlchemy
+-   Pydantic
+-   Pillow
 
----
+------------------------------------------------------------------------
 
 ## Funcionalidades
 
-- CRUD completo de usuários
-- Upload e análise de imagens
-- Detecção de faces
-- Armazenamento local de arquivos
-- Endpoint para acesso às imagens processadas
+-   CRUD de usuários
+-   Upload de imagens
+-   Detecção de faces
+-   Armazenamento local
+-   Acesso às imagens via URL
+-   Histórico de análises
 
----
+------------------------------------------------------------------------
+
+## Endpoints principais
+
+### POST /image/analyze
+
+Recebe uma imagem e retorna o resultado da análise.
+
+Response:
+
+{ "filename": "example.jpg", "faces_detected": 2, "faces": \[ { "x":
+100, "y": 120, "width": 80, "height": 80 } \], "url":
+"http://127.0.0.1:8000/image/files/example.jpg" }
+
+------------------------------------------------------------------------
+
+### GET /image/files/{filename}
+
+Retorna a imagem processada.
+
+Exemplo:
+
+http://127.0.0.1:8000/image/files/example.jpg
+
+------------------------------------------------------------------------
+
+### GET /image/history
+
+Lista análises armazenadas no banco.
+
+------------------------------------------------------------------------
 
 ## Como executar
 
-```bash
 git clone https://github.com/niqueborges/cloud-to-local-ai-platform.git
 cd cloud-to-local-ai-platform
 
 python -m venv venv
 
 # Linux / Mac
+
 source venv/bin/activate
 
 # Windows
-venv\Scripts\activate
+
+venv`\Scripts`{=tex}`\activate`{=tex}
 
 pip install -r requirements.txt
 
 uvicorn app.main:app --reload
 
-Acesse a documentação interativa:
+Acesse:
 
 http://127.0.0.1:8000/docs
 
----
+------------------------------------------------------------------------
 
-{
-  "filename": "example.jpg",
-  "faces_detected": 2,
-  "faces": [
-    {
-      "x": 100,
-      "y": 120,
-      "width": 80,
-      "height": 80
-    }
-  ]
-}
+## Estrutura do projeto
 
----
+app/ ├── main.py ├── database.py ├── dependencies.py ├── modules/ │ ├──
+users/ │ └── image_analysis/ │ ├── router.py │ ├── service.py │ ├──
+models.py │ └── models_db.py ├── models/ │ └──
+haarcascade_frontalface_default.xml
 
-GET /image/files/{filename}
+storage/ └── images/
 
-# Exemplo:
+------------------------------------------------------------------------
 
-http://127.0.0.1:8000/image/files/example.jpg
+## Decisões técnicas
 
----
+-   Processamento local para evitar dependência de cloud
+-   UUID para evitar colisão de arquivos
+-   Service layer para separar lógica do HTTP
+-   SQLite para simplicidade e portabilidade
 
-app/
-├── main.py
-├── database.py
-├── dependencies.py
-├── modules/
-│   ├── users/
-│   └── image_analysis/
-│       ├── router.py
-│       └── service.py
-├── models/
-│   └── haarcascade_frontalface_default.xml
+------------------------------------------------------------------------
 
-storage/
-└── images/
+## Limitações
 
----
+-   Modelo Haar Cascade tem menor precisão que redes neurais modernas
+-   Sem autenticação
+-   Armazenamento local não escalável
 
-Próximos passos:
+------------------------------------------------------------------------
 
-Persistência de metadados das imagens no banco
-Relacionamento entre usuários e análises
-Histórico de processamento
-Melhorias no modelo de detecção
-Possível integração com serviços cloud
+## Próximos passos
 
-Observações:
-Arquivos gerados não são versionados (ignorados via .gitignore)
-O projeto utiliza processamento local, sem dependência externa
+-   Relacionar análises com usuários
+-   Melhorar modelo de detecção (ex: DNN)
+-   Adicionar autenticação
+-   Deploy em ambiente cloud (AWS)
 
+------------------------------------------------------------------------
 
+## Observações
 
+Arquivos gerados não são versionados (ignorados via .gitignore).
