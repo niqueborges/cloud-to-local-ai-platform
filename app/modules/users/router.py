@@ -64,3 +64,4 @@ def update_user(user_id: str, user_update: UserUpdate, db: Session = Depends(get
     db.refresh(user)
 
     return user
+    

@@ -1,3 +1,5 @@
+from app.modules.image_analysis.models_db import ImageAnalysis
+from sqlalchemy.orm import Session
 import uuid
 import os
 import io
@@ -21,7 +23,7 @@ OUTPUT_DIR = os.path.abspath(
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-def process_image(contents: bytes):
+def process_image(contents: bytes, db: Session):
     image = Image.open(io.BytesIO(contents)).convert("RGB")
     image_np = np.array(image)
 
@@ -55,15 +57,28 @@ def process_image(contents: bytes):
             2
         )
 
+    # gerar nome e caminho
     filename = f"{uuid.uuid4()}.jpg"
     file_path = os.path.join(OUTPUT_DIR, filename)
 
+    # salvar imagem
     result_image = Image.fromarray(image_np)
     result_image.save(file_path)
 
+    # salvar no banco
+    analysis = ImageAnalysis(
+        filename=filename,
+        path=file_path,
+        faces_detected=len(faces_data)
+    )
+
+    db.add(analysis)
+    db.commit()
+    db.refresh(analysis)
+
     return {
-        "filename": filename,
-        "faces_detected": len(faces_data),
-        "faces": faces_data,
-        "path": file_path
-    }
+    "filename": filename,
+    "faces_detected": len(faces_data),
+    "faces": faces_data,
+    "url": f"http://127.0.0.1:8000/image/files/{filename}"
+}

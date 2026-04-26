@@ -1,17 +1,23 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from fastapi.responses import FileResponse
-from fastapi import HTTPException
+from sqlalchemy.orm import Session
 import os
 
+from app.dependencies import get_db
 from app.modules.image_analysis.service import process_image, OUTPUT_DIR
+from app.modules.image_analysis.models_db import ImageAnalysis
 
 router = APIRouter(prefix="/image", tags=["Image Analysis"])
 
 
 @router.post("/analyze")
-async def analyze_image(file: UploadFile = File(...)):
+async def analyze_image(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
     contents = await file.read()
-    return process_image(contents)
+    result = process_image(contents, db)
+    return result
 
 
 @router.get("/files/{filename}")
@@ -22,3 +28,18 @@ def get_image(filename: str):
         raise HTTPException(status_code=404, detail="File not found")
 
     return FileResponse(file_path)
+
+
+@router.get("/history")
+def get_history(db: Session = Depends(get_db)):
+    records = db.query(ImageAnalysis).order_by(ImageAnalysis.created_at.desc()).all()
+
+    return [
+        {
+            "id": r.id,
+            "filename": r.filename,
+            "faces_detected": r.faces_detected,
+            "created_at": r.created_at
+        }
+        for r in records
+    ]
