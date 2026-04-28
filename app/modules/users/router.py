@@ -1,67 +1,28 @@
-from fastapi import APIRouter, Depends, HTTPException
+from app.modules.users import service
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.modules.users.models import UserCreate, UserResponse, UserUpdate
-from app.modules.users.models_db import UserDB
 from app.dependencies import get_db
+from app.modules.users.schemas import UserCreate, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["Users"])
-
-
-@router.get("/", response_model=list[UserResponse])
+@router.get("/")
 def list_users(db: Session = Depends(get_db)):
-    users = db.query(UserDB).all()
-    return users
+    return service.list_users(db)
 
-
-@router.post("/", response_model=UserResponse)
+@router.post("/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    new_user = UserDB(
-        name=user.name,
-        email=user.email,
-        birth_date=user.birth_date
-    )
+    return service.create_user(db, user.model_dump())
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return new_user
-
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}")
 def get_user(user_id: str, db: Session = Depends(get_db)):
-    user = db.query(UserDB).filter(UserDB.id == user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    return user
+    return service.get_user(db, user_id)
 
 @router.delete("/{user_id}")
 def delete_user(user_id: str, db: Session = Depends(get_db)):
-    user = db.query(UserDB).filter(UserDB.id == user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    db.delete(user)
-    db.commit()
-
+    service.delete_user(db, user_id)
     return {"message": "User deleted"}
 
-@router.patch("/{user_id}", response_model=UserResponse)
+@router.patch("/{user_id}")
 def update_user(user_id: str, user_update: UserUpdate, db: Session = Depends(get_db)):
-    user = db.query(UserDB).filter(UserDB.id == user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    update_data = user_update.model_dump(exclude_unset=True)
-
-    for key, value in update_data.items():
-        setattr(user, key, value)
-
-    db.commit()
-    db.refresh(user)
-
-    return user
+    return service.update_user(db, user_id, user_update.model_dump(exclude_unset=True))
     
