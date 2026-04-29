@@ -1,8 +1,31 @@
 import os
-import re
 import json
 
 BASE_PATH = "app/modules"
+
+CORE_FILES = [
+    "app/main.py",
+    "app/database.py",
+    "app/dependencies.py",
+]
+
+
+def read_core_files():
+    files_data = []
+
+    for path in CORE_FILES:
+        path = os.path.normpath(path)
+
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            files_data.append({
+                "path": path,
+                "content": content
+            })
+
+    return files_data
 
 
 def read_python_files():
@@ -12,6 +35,7 @@ def read_python_files():
         for file in files:
             if file.endswith(".py"):
                 path = os.path.join(root, file)
+                path = os.path.normpath(path)
 
                 with open(path, "r", encoding="utf-8") as f:
                     content = f.read()
@@ -56,22 +80,38 @@ def remove_comments(code: str) -> str:
 
 def detect_module(path: str) -> str:
     parts = path.split(os.sep)
+    filename = os.path.basename(path)
+
+    if filename in {"main.py", "database.py", "dependencies.py"}:
+        return "core"
+
     if "users" in parts:
         return "users"
+
     if "image_analysis" in parts:
         return "image_analysis"
+
     return "other"
 
 
 def priority(path: str) -> int:
-    if "router" in path:
+    filename = os.path.basename(path)
+
+    if filename in {"main.py", "database.py", "dependencies.py"}:
+        return 0
+
+    if "router" in filename:
         return 1
-    if "service" in path:
+
+    if "service" in filename:
         return 2
-    if "schemas" in path:
+
+    if "schemas" in filename:
         return 3
-    if "models" in path:
+
+    if "models" in filename:
         return 4
+
     return 5
 
 
@@ -79,28 +119,36 @@ def summarize_code(code: str) -> str:
     lines = code.split("\n")
     summary = []
 
-    for i, line in enumerate(lines):
-        line = line.strip()
+    for line in lines:
+        stripped = line.strip()
 
-        if line.startswith("@router"):
-            summary.append(line)
+        if (
+            stripped.startswith("@")
+            or stripped.startswith("def ")
+            or stripped.startswith("class ")
+        ):
+            summary.append(stripped)
 
-        if line.startswith("def ") or line.startswith("class "):
-            summary.append(line)
+    if not summary:
+        summary = [line.strip() for line in lines[:5] if line.strip()]
 
     return "\n".join(summary[:15])
+
 
 def limit_code(code: str, max_chars=1500) -> str:
     return code[:max_chars]
 
 
 def build_context(files):
+    core_files = read_core_files()
+    all_files = core_files + files
+
     output = {
         "project": "cloud-to-local-ai-platform",
         "modules": {}
     }
 
-    for f in files:
+    for f in all_files:
         module = detect_module(f["path"])
 
         if module not in output["modules"]:
@@ -110,11 +158,18 @@ def build_context(files):
             "file": f["path"],
             "priority": priority(f["path"]),
             "summary": summarize_code(f["content"]),
-            "code": remove_comments(f["content"]).strip()
+            "code": limit_code(remove_comments(f["content"]).strip())
         })
 
+    # ordenar arquivos dentro de cada módulo
     for module in output["modules"]:
         output["modules"][module].sort(key=lambda x: x["priority"])
+
+    # garantir core primeiro e resto ordenado
+    output["modules"] = dict(sorted(
+        output["modules"].items(),
+        key=lambda x: (0 if x[0] == "core" else 1, x[0])
+    ))
 
     return output
 
