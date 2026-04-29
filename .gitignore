@@ -73,3 +73,8 @@ temp/
 storage/
 storage/images/
 *.db
+
+# Context files
+.context
+context.json
+context.py

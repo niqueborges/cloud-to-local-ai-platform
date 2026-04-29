@@ -5,7 +5,7 @@ import os
 
 from app.dependencies import get_db
 from app.modules.image_analysis.service import process_image, OUTPUT_DIR
-from app.modules.image_analysis.models_db import ImageAnalysis
+from app.modules.image_analysis.models import ImageAnalysis
 
 router = APIRouter(prefix="/image", tags=["Image Analysis"])
 
