@@ -16,8 +16,14 @@ async def analyze_image(
     db: Session = Depends(get_db)
 ):
     contents = await file.read()
-    result = process_image(contents, db)
-    return result
+
+    try:
+        result = process_image(contents, db)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/files/{filename}")
@@ -43,3 +49,4 @@ def get_history(db: Session = Depends(get_db)):
         }
         for r in records
     ]
+
