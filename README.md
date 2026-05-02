@@ -239,3 +239,11 @@ Sem ele, a detecção de faces não funciona.
 ## Observações
 
 Arquivos gerados não são versionados (ignorados via .gitignore).
+
+## Licença
+
+Este projeto está sob a licença MIT.
+
+Veja o arquivo [LICENSE](./LICENSE).md para mais detalhes.
+
+
