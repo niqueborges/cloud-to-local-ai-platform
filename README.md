@@ -167,12 +167,19 @@ http://127.0.0.1:8000/docs
 
 ## Estrutura do projeto
 
+## Estrutura do projeto
+
+```bash
 app/
 ├── main.py
 ├── database.py
 ├── dependencies.py
 ├── modules/
 │   ├── users/
+│   │   ├── router.py
+│   │   ├── service.py
+│   │   ├── models.py
+│   │   └── schemas.py
 │   └── image_analysis/
 │       ├── router.py
 │       ├── service.py
@@ -183,6 +190,10 @@ app/
 
 storage/
 └── images/
+
+README.md
+requirements.txt
+.gitignore
 
 ---
 
