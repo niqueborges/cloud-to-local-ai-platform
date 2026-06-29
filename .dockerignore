@@ -1,0 +1,15 @@
+.git
+.github
+venv/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+app.db
+docker-compose.yml
+Dockerfile
+.dockerignore
+storage/images/*
+!storage/images/.gitkeep
