@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 from app.dependencies import get_db
 from app.modules.image_analysis.service import process_image, OUTPUT_DIR
 from app.modules.image_analysis.models import ImageAnalysis
+from app.modules.auth.dependencies import get_current_user
 
 router = APIRouter(prefix="/image", tags=["Image Analysis"])
 
@@ -17,7 +18,8 @@ router = APIRouter(prefix="/image", tags=["Image Analysis"])
 @router.post("/analyze")
 async def analyze_image(
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
     contents = await file.read()
 
@@ -43,7 +45,7 @@ def get_image(filename: str):
 
 
 @router.get("/history")
-def get_history(db: Session = Depends(get_db)):
+def get_history(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     records = db.query(ImageAnalysis).order_by(ImageAnalysis.created_at.desc()).all()
 
     return [

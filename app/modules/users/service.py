@@ -2,11 +2,17 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.modules.users.models import UserDB
 
+from app.modules.auth.service import get_password_hash
+
 def list_users(db: Session):
     return db.query(UserDB).all()
 
 def create_user(db: Session, data):
-    user = UserDB(**data)
+    password = data.pop("password", None)
+    if not password:
+        raise ValueError("Password is required")
+        
+    user = UserDB(**data, password_hash=get_password_hash(password))
     db.add(user)
     db.commit()
     db.refresh(user)
