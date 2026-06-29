@@ -22,6 +22,9 @@ wheels/
 pip-log.txt
 pip-delete-this-directory.txt
 
+# Banco antigo
+app.db
+
 # Virtual environments
 venv/
 ENV/
