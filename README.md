@@ -51,6 +51,17 @@ uvicorn app.main:app --reload
 
 A documentação interativa estará disponível em: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
+### Executando a API via Docker
+Caso prefira não instalar o Python e dependências na sua máquina local, nós criamos um `Dockerfile` leve com o `python:3.12-slim` que já baixa o OpenCV. Para utilizá-lo:
+```bash
+# 1. Garanta que o banco de dados via docker-compose (Passo 1) está rodando
+# 2. Construa a imagem da API
+docker build -t cloud-to-local-ai .
+
+# 3. Rode o container da API 
+docker run -p 8000:8000 cloud-to-local-ai
+```
+
 ---
 
 ## Endpoints e Autenticação (JWT)
@@ -62,6 +73,11 @@ Para garantir segurança, endpoints críticos exigem um token Bearer JWT.
 3. **Analisar Imagem (Protegido):** `POST /image/analyze` passando o token JWT no cabeçalho e a imagem via Multipart/Form-data. Retorna bounding boxes e a URL local da imagem processada.
 4. **Visualizar Imagem (Público):** `GET /image/files/{filename}`.
 5. **Histórico (Protegido):** `GET /image/history`.
+
+## Postman / Insomnia
+Se preferir não usar a página local do Swagger `/docs`, o repositório contém o arquivo **`endpoints.json`**. Ele é uma exportação no formato nativo OpenAPI 3.1. 
+
+Basta usar a função de *Import* do seu Postman ou Insomnia apontando para este arquivo, e todas as rotas e regras de payloads aparecerão mapeadas automaticamente para você!
 
 ---
 
