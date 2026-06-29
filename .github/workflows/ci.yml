@@ -25,6 +25,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Download OpenCV Model
+        run: |
+          mkdir -p app/models
+          wget https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml -O app/models/haarcascade_frontalface_default.xml
+
       - name: Run tests
         run: |
           PYTHONPATH=. pytest
