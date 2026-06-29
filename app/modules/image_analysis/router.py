@@ -1,7 +1,11 @@
+import logging
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 import os
+
+logger = logging.getLogger(__name__)
 
 from app.dependencies import get_db
 from app.modules.image_analysis.service import process_image, OUTPUT_DIR
@@ -18,17 +22,19 @@ async def analyze_image(
     contents = await file.read()
 
     try:
-        result = process_image(contents, db)
+        result = await run_in_threadpool(process_image, contents, db)
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception:
+        logger.exception("Erro ao processar imagem")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/files/{filename}")
 def get_image(filename: str):
-    file_path = os.path.join(OUTPUT_DIR, filename)
+    safe_filename = os.path.basename(filename)
+    file_path = os.path.join(OUTPUT_DIR, safe_filename)
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
