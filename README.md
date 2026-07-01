@@ -95,6 +95,7 @@ app/
 ├── main.py
 ├── database.py
 ├── dependencies.py
+├── worker.py           # Celery App e fila de tarefas em background
 ├── modules/
 │   ├── auth/           # Geração e validação de JWT / senhas
 │   ├── users/          # CRUD de usuários 
