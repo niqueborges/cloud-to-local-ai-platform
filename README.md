@@ -11,8 +11,8 @@ O objetivo principal é eliminar o custo recorrente e a latência de rede associ
 
 O sistema é modular e utiliza os seguintes padrões:
 - **Router/Service/Schema/Model:** Isolamento de responsabilidades (Clean Architecture leve). O router não possui lógica de negócio.
-- **Processamento Assíncrono:** A detecção do OpenCV (Haar Cascade) é bloqueante. Utilizamos `run_in_threadpool` no FastAPI para manter o Event Loop livre e permitir alta concorrência.
-- **Armazenamento Híbrido:** Imagens são salvas em disco (na pasta `storage/images/`), enquanto metadados e credenciais ficam no banco relacional.
+- **Processamento em Background (Filas):** A detecção do OpenCV (Haar Cascade) é pesada. Utilizamos **Celery + Redis** para enfileirar as tarefas, liberando a API imediatamente e garantindo alta concorrência.
+- **Armazenamento Sem Estado (Stateless):** Imagens são salvas em um Object Storage compatível com S3 (**MinIO**), enquanto metadados e credenciais ficam no banco relacional PostgreSQL. Nenhuma imagem é salva no disco local da API.
 
 ## Tecnologias e Infraestrutura
 
