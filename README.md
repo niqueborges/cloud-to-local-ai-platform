@@ -77,8 +77,8 @@ Para garantir segurança, endpoints críticos exigem um token Bearer JWT.
 
 1. **Criar Usuário:** `POST /users/` enviando um JSON com `name`, `email`, `password` e `birth_date`.
 2. **Login:** `POST /auth/token` enviando `username` (email) e `password` via FormData para receber o JWT.
-3. **Analisar Imagem (Protegido):** `POST /image/analyze` passando o token JWT no cabeçalho e a imagem via Multipart/Form-data. Retorna bounding boxes e a URL local da imagem processada.
-4. **Visualizar Imagem (Público):** `GET /image/files/{filename}`.
+3. **Analisar Imagem (Protegido):** `POST /image/analyze` passando o token JWT no cabeçalho e a imagem via Multipart/Form-data. Retorna o ID da análise, status (`PENDING`) e a URL pré-assinada da imagem no MinIO.
+4. **Visualizar Imagem (Público):** `GET /image/files/{filename}`. Redireciona automaticamente para a URL pré-assinada do Object Storage.
 5. **Histórico (Protegido):** `GET /image/history`.
 
 ## Postman / Insomnia
