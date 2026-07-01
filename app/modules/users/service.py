@@ -2,12 +2,12 @@ from sqlalchemy.orm import Session
 
 from app.modules.users.models import UserDB
 
-from app.modules.auth.service import get_password_hash
 
 def list_users(db: Session):
     return db.query(UserDB).all()
 
 def create_user(db: Session, data):
+    from app.modules.auth.service import get_password_hash
     password = data.pop("password", None)
     if not password:
         raise ValueError("Password is required")
