@@ -8,6 +8,20 @@ import os
 
 client = TestClient(app)
 
+from unittest.mock import patch
+
+@pytest.fixture(autouse=True)
+def mock_s3_client():
+    with patch("app.modules.image_analysis.service.s3_client") as mock_s3:
+        mock_s3.put_object.return_value = {}
+        mock_s3.generate_presigned_url.return_value = "http://mocked-url/image.jpg"
+        yield mock_s3
+
+@pytest.fixture(autouse=True)
+def mock_celery_task():
+    with patch("app.modules.image_analysis.router.process_image_task") as mock_task:
+        yield mock_task
+
 @pytest.fixture(autouse=True)
 def setup_db():
     Base.metadata.create_all(bind=engine)
@@ -55,14 +69,13 @@ def test_analyze_image_mock(auth_headers):
         headers=auth_headers
     )
     
-    assert response.status_code == 200
+    assert response.status_code == 202
     data = response.json()
     assert "filename" in data
-    assert "faces_detected" in data
-    assert data["faces_detected"] == 0 
-    assert "faces" in data
+    assert "message" in data
+    assert data["status"] == "PENDING"
     assert "url" in data
 
-def test_get_image_not_found():
-    response = client.get("/image/files/notfound.jpg")
-    assert response.status_code == 404
+def test_get_image_redirect():
+    response = client.get("/image/files/notfound.jpg", follow_redirects=False)
+    assert response.status_code == 307
