@@ -21,6 +21,7 @@ O sistema é modular e utiliza os seguintes padrões:
 - **Segurança:** PyJWT, passlib (bcrypt)
 - **Banco de Dados:** PostgreSQL (via driver puro Python `pg8000`) 
 - **ORM:** SQLAlchemy
+- **Migrações:** Alembic
 - **CI/CD:** Github Actions para testes no Pytest
 
 ---
@@ -42,9 +43,12 @@ wget https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/ha
 
 ### 3. Instalar Dependências e Rodar a API
 ```bash
-python -m venv venv
-source venv/bin/activate  # ou venv\Scripts\activate no Windows
+python -m venv .venv
+source .venv/bin/activate  # ou .\.venv\Scripts\Activate.ps1 no Windows
 pip install -r requirements.txt
+
+# Execute as migrações do banco de dados (Alembic)
+alembic upgrade head
 
 uvicorn app.main:app --reload
 ```
@@ -98,7 +102,6 @@ app/
 ```
 
 ## Próximos Passos
-- Vincular o modelo `ImageAnalysis` diretamente à chave estrangeira `user_id` do usuário logado (multitenancy).
 - Substituir o Haar Cascade (veloz, mas impreciso) por um modelo DNN mais robusto do OpenCV.
 - Migrar armazenamento de disco local para um serviço de storage S3-compatible, facilitando o deploy na nuvem.
 
