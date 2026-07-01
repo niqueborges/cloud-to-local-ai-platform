@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
+
 from app.modules.users.models import UserDB
 
 from app.modules.auth.service import get_password_hash
@@ -18,10 +18,13 @@ def create_user(db: Session, data):
     db.refresh(user)
     return user
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(UserDB).filter(UserDB.email == email).first()
+
 def get_user(db: Session, user_id: str):
     user = db.query(UserDB).filter(UserDB.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise ValueError("User not found")
     return user
 
 def delete_user(db: Session, user_id: str):
