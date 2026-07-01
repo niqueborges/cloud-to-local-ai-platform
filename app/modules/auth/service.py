@@ -3,7 +3,7 @@ from passlib.context import CryptContext
 import jwt
 from typing import Optional
 from sqlalchemy.orm import Session
-from app.modules.users.models import UserDB
+from app.modules.users.service import get_user_by_email
 
 SECRET_KEY = "super-secret-key-for-local-dev-only" # Em prod, use variável de ambiente
 ALGORITHM = "HS256"
@@ -17,8 +17,7 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(UserDB).filter(UserDB.email == email).first()
+
 
 def authenticate_user(db: Session, email: str, password: str):
     user = get_user_by_email(db, email)
