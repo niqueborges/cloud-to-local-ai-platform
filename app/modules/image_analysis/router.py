@@ -24,7 +24,7 @@ async def analyze_image(
     contents = await file.read()
 
     try:
-        result = await run_in_threadpool(process_image, contents, db)
+        result = await run_in_threadpool(process_image, contents, db, current_user.id)
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -46,7 +46,7 @@ def get_image(filename: str):
 
 @router.get("/history")
 def get_history(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    records = db.query(ImageAnalysis).order_by(ImageAnalysis.created_at.desc()).all()
+    records = db.query(ImageAnalysis).filter(ImageAnalysis.user_id == current_user.id).order_by(ImageAnalysis.created_at.desc()).all()
 
     return [
         {

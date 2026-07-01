@@ -76,11 +76,12 @@ def save_image(image_np):
 
     return filename, file_path
 
-def save_analysis(db: Session, filename: str, path: str, faces_count: int):
+def save_analysis(db: Session, filename: str, path: str, faces_count: int, user_id: str):
     analysis = ImageAnalysis(
         filename=filename,
         path=path,
-        faces_detected=faces_count
+        faces_detected=faces_count,
+        user_id=user_id
     )
 
     db.add(analysis)
@@ -89,7 +90,7 @@ def save_analysis(db: Session, filename: str, path: str, faces_count: int):
 
     return analysis
 
-def process_image(contents: bytes, db: Session):
+def process_image(contents: bytes, db: Session, user_id: str):
     image_np = load_image(contents)
 
     faces = detect_faces(image_np)
@@ -100,7 +101,7 @@ def process_image(contents: bytes, db: Session):
 
     filename, file_path = save_image(image_np)
 
-    analysis = save_analysis(db, filename, file_path, len(faces_data))
+    analysis = save_analysis(db, filename, file_path, len(faces_data), user_id)
 
     return {
         "id": analysis.id,

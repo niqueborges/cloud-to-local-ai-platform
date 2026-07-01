@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from datetime import datetime
 from app.database import Base
 
@@ -11,3 +11,4 @@ class ImageAnalysis(Base):
     path = Column(String, nullable=False)
     faces_detected = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
