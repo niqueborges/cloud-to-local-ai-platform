@@ -21,6 +21,8 @@ O sistema é modular e utiliza os seguintes padrões:
 - **Segurança:** PyJWT, passlib (bcrypt)
 - **Banco de Dados:** PostgreSQL (via driver puro Python `pg8000`) 
 - **ORM:** SQLAlchemy
+- **Armazenamento:** MinIO (S3-Compatible Object Storage)
+- **Fila de Tarefas (Background):** Celery + Redis
 - **Migrações:** Alembic
 - **CI/CD:** Github Actions para testes no Pytest
 
@@ -28,11 +30,12 @@ O sistema é modular e utiliza os seguintes padrões:
 
 ## Como Executar
 
-### 1. Iniciar o Banco de Dados (Docker)
-O projeto utiliza PostgreSQL para suportar cargas escaláveis (abandonamos o SQLite local). Para subir o banco de desenvolvimento localmente, certifique-se de ter o Docker instalado:
+### 1. Iniciar os Serviços de Infraestrutura (Docker)
+O projeto depende de **PostgreSQL**, **MinIO** e **Redis**. Para subir os serviços locais de desenvolvimento, certifique-se de ter o Docker instalado e rode:
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
+Isso também iniciará o **Celery Worker** em background para o processamento de imagens.
 
 ### 2. Baixar o Modelo do OpenCV
 Baixe manualmente o classificador de faces do repositório oficial e coloque na pasta `app/models/`:
@@ -103,7 +106,7 @@ app/
 
 ## Próximos Passos
 - Substituir o Haar Cascade (veloz, mas impreciso) por um modelo DNN mais robusto do OpenCV.
-- Migrar armazenamento de disco local para um serviço de storage S3-compatible, facilitando o deploy na nuvem.
+- Implementar WebSockets para notificar o Frontend em tempo real assim que o Celery concluir o processamento da imagem.
 
 ## Licença
 Este projeto está sob a licença MIT.
