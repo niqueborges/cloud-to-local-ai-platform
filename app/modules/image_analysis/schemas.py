@@ -1,12 +1,14 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 
 class ImageAnalysisResponse(BaseModel):
     id: int
     filename: str
     path: str
-    faces_detected: int
+    status: str
+    faces_detected: Optional[int] = None
     created_at: datetime
 
     class Config:
