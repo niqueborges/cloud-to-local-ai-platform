@@ -9,8 +9,8 @@ from app.modules.image_analysis import models  # importante importar
 
 app = FastAPI()
 
-# cria as tabelas no banco
-Base.metadata.create_all(bind=engine)
+# As tabelas agora são gerenciadas via migrations do Alembic
+# Base.metadata.create_all(bind=engine)
 
 # routers
 app.include_router(users_router)
