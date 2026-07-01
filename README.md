@@ -91,18 +91,25 @@ Basta usar a função de *Import* do seu Postman ou Insomnia apontando para este
 ## Estrutura do Código
 
 ```bash
-app/
-├── main.py
-├── database.py
-├── dependencies.py
-├── worker.py           # Celery App e fila de tarefas em background
-├── modules/
-│   ├── auth/           # Geração e validação de JWT / senhas
-│   ├── users/          # CRUD de usuários 
-│   └── image_analysis/ # Regras de OpenCV e rotas de imagem
-├── models/
-│   └── haarcascade_frontalface_default.xml
-...
+cloud-to-local-ai-platform/
+├── alembic/                # Configurações e scripts de migração do banco
+│   └── versions/           # Histórico de migrações geradas
+├── app/
+│   ├── main.py             # Ponto de entrada da API FastAPI
+│   ├── database.py         # Conexão e engine do SQLAlchemy
+│   ├── dependencies.py     # Injeção de dependência (ex: get_db)
+│   ├── worker.py           # Celery App e fila de tarefas em background
+│   ├── models/             # Arquivos de Machine Learning brutos
+│   │   └── haarcascade_frontalface_default.xml
+│   └── modules/            # Funcionalidades isoladas (Clean Architecture)
+│       ├── auth/           # Geração e validação de JWT / senhas
+│       ├── users/          # CRUD de usuários e schemas
+│       └── image_analysis/ # Regras de OpenCV e rotas assíncronas
+├── tests/                  # Bateria de testes unitários (Pytest)
+├── docker-compose.yml      # Orquestração de containers (DB, MinIO, Redis, Celery)
+├── Dockerfile              # Receita para build da imagem do backend
+├── alembic.ini             # Configuração raiz do Alembic
+└── requirements.txt        # Dependências do Python
 ```
 
 ## Próximos Passos
